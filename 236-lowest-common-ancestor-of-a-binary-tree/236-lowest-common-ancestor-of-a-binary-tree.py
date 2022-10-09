@@ -6,26 +6,29 @@
 #         self.right = None
 
 class Solution:
+    def __init__(self):
+        self.ans = None
+        self.done = False
+        
     def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
-        queue = [[root]]
-        
-        while queue:
-            new = queue.pop(0)
-            if new[-1] == p:
-                p_ancestors = new
-            if new[-1] == q:
-                q_ancestors = new
+        def helper(root, p, q):
+            if self.done:
+                return
+            
+            if root == None:
+                return [False, False]
+            
+            seen_left = helper(root.left, p, q)
+            seen_right = helper(root.right, p, q)
                 
-            if new[-1].left is not None:
-                queue.append(new + [new[-1].left])
-            if new[-1].right is not None:
-                queue.append(new + [new[-1].right])
-        p_ancestors = set(p_ancestors)
-        
-        for ancestor in q_ancestors[::-1]:
-            if ancestor in p_ancestors:
-                return ancestor
-        
-        
-        
-        
+            seen_p = root == p or seen_left[0] or seen_right[0]
+            seen_q = root == q or seen_left[1] or seen_right[1]
+            
+            if seen_p and seen_q and not self.done:
+                self.ans = root
+                self.done = True
+
+            return [seen_p, seen_q]
+            
+        helper(root, p, q)
+        return self.ans
